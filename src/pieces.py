@@ -32,7 +32,6 @@ class Rook:
         self.rank = rank
         self.num_moves = 0
         self.move_history = []
-        self.legal_moves = []
 
     def __str__(self):
         if self.side == 'b':
@@ -208,6 +207,18 @@ class Bishop:
 
     def __repr__(self):
         return "{} Bishop {}{}".format(self.side, self.file, self.rank)
+
+    def all_legal_moves(self):
+        """
+        Bishop can move diagonally in four directions. Can't jump over other pieces.
+        Move is not legal if it leads to check.
+
+        Returns
+        -------
+        list: str
+            chess squares where piece can be legally moved
+        """
+        pass
 
     def can_mate_king(self, king_pos, future_board_state):
         # TODO
