@@ -324,7 +324,7 @@ class Bishop:
                     break
             else:
                 continue
-        
+
         # Increase the rank and decrease the file
         for r, f in zip(RANKS[rank_index + 1:], FILES[:file_index][::-1]):
             chess_square = f + r
