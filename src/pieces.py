@@ -218,10 +218,139 @@ class Bishop:
         list: str
             chess squares where piece can be legally moved
         """
-        pass
+        rank_index = RANKS.index(self.rank)
+        file_index = FILES.index(self.file)
+        moves = []
+
+        # Increasing the rank and file
+        for r, f in zip(RANKS[rank_index + 1:], FILES[file_index + 1:]):
+            chess_square = f + r
+            if self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side != self.side:
+                if self.board.leads_to_check(self, f, r):
+                    continue
+                else:
+                    moves.append(chess_square)
+                    # Can only move till capturing the opponent's piece.
+                    break
+            elif self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side == self.side:
+                # Can't jump over same side's piece.
+                break
+            else:
+                if self.board.leads_to_check(self, f, r):
+                    continue
+                else:
+                    moves.append(chess_square)
+
+        # Decreasing the rank and file. Order is crucial, so reversing.
+        for r, f in zip(RANKS[:rank_index][::-1], FILES[:file_index][::-1]):
+            chess_square = f + r
+            if self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side != self.side:
+                if self.board.leads_to_check(self, f, r):
+                    continue
+                else:
+                    moves.append(chess_square)
+                    break
+            elif self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side == self.side:
+                break
+            else:
+                if self.board.leads_to_check(self, f, r):
+                    continue
+                else:
+                    moves.append(chess_square)
+
+        # Increasing the file and decreasing the rank
+        for r, f in zip(RANKS[:rank_index][::-1], [FILES[file_index + 1:]]):
+            chess_square = f + r
+            if self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side != self.side:
+                if self.board.leads_to_check(self, f, r):
+                    continue
+                else:
+                    moves.append(chess_square)
+                    break
+            elif self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side == self.side:
+                break
+            else:
+                if self.board.leads_to_check(self, f, r):
+                    continue
+                else:
+                    moves.append(chess_square)
+
+        # Decreasing the file and increasing the rank
+        for r, f in zip(RANKS[rank_index+1:], FILES[:file_index][::-1]):
+            chess_square = f + r
+            if self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side != self.side:
+                if self.board.leads_to_check(self, f, r):
+                    continue
+                else:
+                    moves.append(chess_square)
+                    break
+            elif self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side == self.side:
+                break
+            else:
+                if self.board.leads_to_check(self, f, r):
+                    continue
+                else:
+                    moves.append(chess_square)
+
+        return moves
 
     def can_mate_king(self, king_pos, future_board_state):
         # TODO
+        rank_index = RANKS.index(self.rank)
+        file_index = FILES.index(self.file)
+
+        # Increasing the rank and file
+        for r, f in zip(RANKS[rank_index + 1:], FILES[file_index + 1:]):
+            chess_square = f + r
+            if future_board_state[chess_square] is not None and future_board_state[chess_square].side == self.side:
+                break
+            elif future_board_state[chess_square] is not None and future_board_state[chess_square].side != self.side:
+                if chess_square == king_pos:
+                    return True
+                else:
+                    break
+            else:
+                continue
+        
+        # Decrease the rank and file
+        for r, f in zip(RANKS[:rank_index][::-1], FILES[:file_index][::-1]):
+            chess_square = f + r
+            if future_board_state[chess_square] is not None and future_board_state[chess_square].side == self.side:
+                break
+            elif future_board_state[chess_square] is not None and future_board_state[chess_square].side != self.side:
+                if chess_square == king_pos:
+                    return True
+                else:
+                    break
+            else:
+                continue
+        
+        # Increase the rank and decrease the file
+        for r, f in zip(RANKS[rank_index+1:], FILES[:file_index][::-1]):
+            chess_square = f + r
+            if future_board_state[chess_square] is not None and future_board_state[chess_square].side == self.side:
+                break
+            elif future_board_state[chess_square] is not None and future_board_state[chess_square].side != self.side:
+                if chess_square == king_pos:
+                    return True
+                else:
+                    break
+            else:
+                continue
+
+        # Increasing the file and decreasing the rank
+        for r, f in zip(RANKS[:rank_index][::-1], [FILES[file_index + 1:]]):
+            chess_square = f + r
+            if future_board_state[chess_square] is not None and future_board_state[chess_square].side == self.side:
+                break
+            elif future_board_state[chess_square] is not None and future_board_state[chess_square].side != self.side:
+                if chess_square == king_pos:
+                    return True
+                else:
+                    break
+            else:
+                continue
+
         return False
 
 
