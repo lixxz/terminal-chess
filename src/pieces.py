@@ -259,7 +259,7 @@ class Bishop:
                     moves.append(chess_square)
 
         # Increasing the file and decreasing the rank
-        for r, f in zip(RANKS[:rank_index][::-1], [FILES[file_index + 1:]]):
+        for r, f in zip(RANKS[:rank_index][::-1], FILES[file_index + 1:]):
             chess_square = f + r
             if self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side != self.side:
                 if self.board.leads_to_check(self, f, r):
@@ -339,8 +339,9 @@ class Bishop:
                 continue
 
         # Increasing the file and decreasing the rank
-        for r, f in zip(RANKS[:rank_index][::-1], [FILES[file_index + 1:]]):
+        for r, f in zip(RANKS[:rank_index][::-1], FILES[file_index + 1:]):
             chess_square = f + r
+            print(chess_square)
             if future_board_state[chess_square] is not None and future_board_state[chess_square].side == self.side:
                 break
             elif future_board_state[chess_square] is not None and future_board_state[chess_square].side != self.side:
