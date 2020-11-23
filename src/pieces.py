@@ -340,7 +340,6 @@ class Bishop:
         # Increasing the file and decreasing the rank
         for r, f in zip(RANKS[:rank_index][::-1], FILES[file_index + 1:]):
             chess_square = f + r
-            print(chess_square)
             if future_board_state[chess_square] is not None and future_board_state[chess_square].side == self.side:
                 break
             elif future_board_state[chess_square] is not None and future_board_state[chess_square].side != self.side:
@@ -639,7 +638,6 @@ class Queen:
         # Increasing the file and decreasing the rank
         for r, f in zip(RANKS[:rank_index][::-1], FILES[file_index + 1:]):
             chess_square = f + r
-            print(chess_square)
             if future_board_state[chess_square] is not None and future_board_state[chess_square].side == self.side:
                 break
             elif future_board_state[chess_square] is not None and future_board_state[chess_square].side != self.side:
