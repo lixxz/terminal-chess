@@ -7,7 +7,7 @@ class Pawn:
         self.side = side
         self.file = file
         self.rank = rank
-        self.num_moves = 0
+        self.num_moves = -1 # -1 -> 0 when pieces are initialized on the board by Board._put()
         self.move_history = []
 
     def __str__(self):
@@ -18,6 +18,9 @@ class Pawn:
 
     def __repr__(self):
         return "{} Pawn {}{}".format(self.side, self.file, self.rank)
+
+    def all_legal_moves(self):
+        pass
 
     def can_mate_king(self, king_pos, future_board_state):
         # TODO
@@ -30,7 +33,7 @@ class Rook:
         self.side = side
         self.file = file
         self.rank = rank
-        self.num_moves = 0
+        self.num_moves = -1 
         self.move_history = []
 
     def __str__(self):
@@ -196,7 +199,7 @@ class Bishop:
         self.side = side
         self.file = file
         self.rank = rank
-        self.num_moves = 0
+        self.num_moves = -1
         self.move_history = []
 
     def __str__(self):
@@ -359,7 +362,7 @@ class Knight:
         self.side = side
         self.file = file
         self.rank = rank
-        self.num_moves = 0
+        self.num_moves = -1
         self.move_history = []
 
     def __str__(self):
@@ -382,7 +385,7 @@ class Queen:
         self.side = side
         self.file = file
         self.rank = rank
-        self.num_moves = 0
+        self.num_moves = -1
         self.move_history = []
 
     def __str__(self):
@@ -657,7 +660,7 @@ class King:
         self.side = side
         self.file = file
         self.rank = rank
-        self.num_moves = 0
+        self.num_moves = -1
         self.move_history = []
 
     def __str__(self):
@@ -669,6 +672,46 @@ class King:
     def __repr__(self):
         return "{} King {}{}".format(self.side, self.file, self.rank)
 
+    def all_legal_moves(self):
+        rank_index = RANKS.index(self.rank)
+        file_index = FILES.index(self.file)
+        moves = []
+
+        for r in [-1, 0, 1]:
+            for f in [-1, 0, 1]:
+                if r == f == 0:
+                    continue
+                elif 0 <= rank_index + r < len(RANKS) and 0 <= file_index + f < len(FILES):
+                    chess_square = f + r
+                    if self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side != self.side:
+                        if self.board.leads_to_check(self, chess_square[0], chess_square[1]):
+                            continue
+                        else:
+                            moves.append(chess_square)
+                            break
+                    elif self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side == self.side:
+                        break
+                    else:
+                        if self.board.leads_to_check(self, chess_square[0], chess_square[1]):
+                            continue
+                        else:
+                            moves.append(chess_square)
+                else:
+                    continue
+
+        if self.num_moves == 0:
+            # Queenside Castling
+            queenside_rook = self.board.current_state['state']['a' + self.rank]
+            if queenside_rook is not None and queenside_rook.__class__ == Rook and queenside_rook.num_moves == 0:
+                pass
+
+            # Kingside Castling
+            kingside_rook = self.board.current_state['state']['h' + self.rank]
+            if kingside_rook is not None and kingside_rook.__class__ == Rook and kingside_rook.num_moves == 0:
+                pass
+
+        return moves
+
     def can_mate_king(self, king_pos, future_board_state):
-        # TODO
+
         return False

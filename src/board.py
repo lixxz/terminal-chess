@@ -143,11 +143,8 @@ class Board:
         bool
             True if square is under attack, False otherwise
         """
-        chess_square = file + rank
-
-        for k in self.current_state['state'].values():
-            if k.side != self.current_state['player'] and chess_square in k.all_legal_moves():
-                return True
+        if file + rank in self.all_legal_moves():
+            return True
 
         return False
 
@@ -168,5 +165,9 @@ class Board:
             List of all legal moves
         """
         moves = []
+
+        for m in self.current_state['state'].values():
+            if m.side != self.current_state['player']:
+                moves.extend(m.all_legal_moves())
 
         return moves
