@@ -143,7 +143,7 @@ class Board:
         bool
             True if square is under attack, False otherwise
         """
-        if file + rank in self.all_legal_moves():
+        if file + rank in self.all_legal_moves().values():
             return True
 
         return False
@@ -161,13 +161,13 @@ class Board:
 
         Returns
         -------
-        list
-            List of all legal moves
+        dict
+            Piece: [List of Moves]
         """
-        moves = []
+        moves = {}
 
         for m in self.current_state['state'].values():
-            if m.side != self.current_state['player']:
-                moves.extend(m.all_legal_moves())
+            if m is not None and m.side == self.current_state['player']:
+                moves[repr(m)[2:]] = m.all_legal_moves()
 
         return moves

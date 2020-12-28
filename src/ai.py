@@ -1,5 +1,3 @@
-
-
 class AI:
     def __init__(self, board, difficulty):
         self.board = board

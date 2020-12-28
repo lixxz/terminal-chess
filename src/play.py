@@ -1,3 +1,4 @@
+import argparse
 from board import Board
 from consts import WHITE, BLACK, RESET
 from ai import AI
@@ -60,6 +61,10 @@ def main():
             pass
         break
 
+
+class Parser:
+    def __init__(self):
+        self.parser = argparse.ArgumentParser()
 
 if __name__ == "__main__":
     main()

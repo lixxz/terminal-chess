@@ -702,12 +702,12 @@ class King:
         if self.num_moves == 0:
             # Queenside Castling
             queenside_rook = self.board.current_state['state']['a' + self.rank]
-            if queenside_rook is not None and queenside_rook.__class__ == Rook and queenside_rook.num_moves == 0:
+            if queenside_rook is not None and queenside_rook.__class__ == Rook and queenside_rook.num_moves == 0 and not any(self.board.current_state['state'][f + self.rank] for f in 'bcd'):
                 pass
 
             # Kingside Castling
             kingside_rook = self.board.current_state['state']['h' + self.rank]
-            if kingside_rook is not None and kingside_rook.__class__ == Rook and kingside_rook.num_moves == 0:
+            if kingside_rook is not None and kingside_rook.__class__ == Rook and kingside_rook.num_moves == 0 and not any(self.board.current_state['state'][f + self.rank] for f in 'fg'):
                 pass
 
         return moves
