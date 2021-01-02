@@ -62,9 +62,5 @@ def main():
         break
 
 
-class Parser:
-    def __init__(self):
-        self.parser = argparse.ArgumentParser()
-
 if __name__ == "__main__":
     main()

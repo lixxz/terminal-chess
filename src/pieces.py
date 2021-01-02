@@ -713,5 +713,15 @@ class King:
         return moves
 
     def can_mate_king(self, king_pos, future_board_state):
+        rank_index = RANKS.index(self.rank)
+        file_index = FILES.index(self.file)
 
+        for r in [-1, 0, 1]:
+            for f in [-1, 0, 1]:
+                if r == f == 0:
+                    continue
+                elif 0 <= rank_index + r < len(RANKS) and 0 <= file_index + f < len(FILES):
+                    chess_square = f + r
+                    if future_board_state[chess_square] is not None and future_board_state[chess_square].side != self.side and chess_square == king_pos:
+                        return True
         return False
