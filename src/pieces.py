@@ -33,7 +33,7 @@ class Rook:
         self.side = side
         self.file = file
         self.rank = rank
-        self.num_moves = -1 
+        self.num_moves = -1
         self.move_history = []
 
     def __str__(self):
@@ -703,7 +703,9 @@ class King:
             # Queenside Castling
             queenside_rook = self.board.current_state['state']['a' + self.rank]
             if queenside_rook is not None and queenside_rook.__class__ == Rook and queenside_rook.num_moves == 0 and not any(self.board.current_state['state'][f + self.rank] for f in 'bcd'):
-                pass
+                # If king is not currently in check
+                if not self.board.leads_to_check(self, self.file, self.rank):
+                    pass
 
             # Kingside Castling
             kingside_rook = self.board.current_state['state']['h' + self.rank]

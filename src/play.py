@@ -1,4 +1,4 @@
-import argparse
+from exceptions import InvalidMove
 from board import Board
 from consts import WHITE, BLACK, RESET
 from ai import AI
@@ -53,7 +53,11 @@ def main():
             if move == '?':
                 show_help()
             else:
-                b.input(move)
+                try:
+                    b.input(move)
+                except InvalidMove:
+                    print("Invalid Move")
+                    continue
             pass
         else:
             # AI's turn

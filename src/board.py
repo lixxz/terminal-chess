@@ -5,7 +5,7 @@ from consts import (
     PIPE_AND_SPACE_3, PIPE_AND_SPACE_2, PIPE_AND_SPACE_1
 )
 from pieces import Rook, Queen, King, Knight, Pawn, Bishop
-from exceptions import PieceAlreadyPresent
+from exceptions import PieceAlreadyPresent, InvalidMove
 from copy import deepcopy
 
 
@@ -56,8 +56,19 @@ class Board:
 
     def input(self, move_string):
         """
-        Parses move_string according to Standard Algebraic Notation.
+        Parses move_string and changes board state
         """
+        move_string = move_string.strip('\n').split(' ')
+
+        # Validating
+        if len(move_string) != 2 or move_string[0][0] not in FILES or move_string[0][1] not in RANKS or move_string[1][0] not in FILES or move_string[1][1] not in RANKS or self.current_state['state'][move_string[0]] is not None or move_string[1] not in self.current_state['state'][move_string[0]].all_legal_moves():
+            raise InvalidMove
+
+        # Check if en passant, castling or promotion
+        if self.current_state['state'][move_string[0]].__class__ == King:
+            pass
+        elif self.current_state['state'][move_string[0]].__class__ == Pawn:
+            pass
         pass
 
     def _put(self, piece, file, rank):
@@ -143,8 +154,9 @@ class Board:
         bool
             True if square is under attack, False otherwise
         """
-        if file + rank in self.all_legal_moves().values():
-            return True
+        for p in self.current_state['state'].values():
+            if p is not None and p.side != self.current_state['player'] and p.can_mate_king(file + rank, self.current_state['state']):
+                return True
 
         return False
 
