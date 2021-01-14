@@ -22,30 +22,33 @@ class Board:
         self.current_state = {'player': SIDES[0], 'move': None, 'state': {f + r: None for f in FILES for r in RANKS}}
         self.history = []
         self.num_moves = 0
+        # When pawn moves two steps and opposition pawn is beside it
+        # pawn sets this flag for opponent's next turn
+        self.en_passant_possible = False
 
         self._put(Rook(self, SIDES[0], 'a', '1'), 'a', '1')
         self._put(Rook(self, SIDES[0], 'h', '1'), 'h', '1')
-        self._put(Knight(self, SIDES[0], 'b', '1'), 'b', '1')
-        self._put(Knight(self, SIDES[0], 'g', '1'), 'g', '1')
-        self._put(Bishop(self, SIDES[0], 'c', '1'), 'c', '1')
-        self._put(Bishop(self, SIDES[0], 'f', '1'), 'f', '1')
-        self._put(Queen(self, SIDES[0], 'd', '1'), 'd', '1')
+        self._put(Knight(self, SIDES[0], 'c', '6'), 'c', '6')
+        self._put(Knight(self, SIDES[0], 'g', '2'), 'g', '2')
+        # self._put(Bishop(self, SIDES[0], 'c', '1'), 'c', '1')
+        # self._put(Bishop(self, SIDES[0], 'f', '1'), 'f', '1')
+        # self._put(Queen(self, SIDES[0], 'd', '1'), 'd', '1')
         self._put(King(self, SIDES[0], 'e', '1'), 'e', '1')
 
-        for f in FILES:
-            self._put(Pawn(self, SIDES[0], f, '2'), f, '2')
+        # for f in FILES:
+        #     self._put(Pawn(self, SIDES[0], f, '2'), f, '2')
 
         self._put(Rook(self, SIDES[1], 'a', '8'), 'a', '8')
         self._put(Rook(self, SIDES[1], 'h', '8'), 'h', '8')
-        self._put(Knight(self, SIDES[1], 'b', '8'), 'b', '8')
-        self._put(Knight(self, SIDES[1], 'g', '8'), 'g', '8')
-        self._put(Bishop(self, SIDES[1], 'c', '8'), 'c', '8')
-        self._put(Bishop(self, SIDES[1], 'f', '8'), 'f', '8')
-        self._put(Queen(self, SIDES[1], 'd', '8'), 'd', '8')
+        # self._put(Knight(self, SIDES[1], 'd', '2'), 'd', '2')
+        # self._put(Knight(self, SIDES[1], 'e', '3'), 'e', '3')
+        # self._put(Bishop(self, SIDES[1], 'c', '8'), 'c', '8')
+        # self._put(Bishop(self, SIDES[1], 'f', '8'), 'f', '8')
+        # self._put(Queen(self, SIDES[1], 'd', '8'), 'd', '8')
         self._put(King(self, SIDES[1], 'e', '8'), 'e', '8')
 
-        for f in FILES:
-            self._put(Pawn(self, SIDES[1], f, '7'), f, '7')
+        # for f in FILES:
+        #     self._put(Pawn(self, SIDES[1], f, '7'), f, '7')
 
     def draw(self):
         for g in self._grid:
@@ -64,16 +67,24 @@ class Board:
         if len(move_string) != 2 or move_string[0][0] not in FILES or move_string[0][1] not in RANKS or move_string[1][0] not in FILES or move_string[1][1] not in RANKS or self.current_state['state'][move_string[0]] is not None or move_string[1] not in self.current_state['state'][move_string[0]].all_legal_moves():
             raise InvalidMove
 
-        # Check if en passant, castling or promotion
-        if self.current_state['state'][move_string[0]].__class__ == King:
-            pass
+        # Check if castling
+        if self.current_state['state'][move_string[0]].__class__ == King and move_string[1] in ['c1', 'g1', 'c8', 'g8']:
+            self._put(self.current_state['state'][move_string[0]], move_string[1][0], move_string[1][1])
+            if move_string[1][0] == 'c':
+                self._put(self.current_state['state']['a' + move_string[1][1]], 'd', move_string[1][1])
+            elif move_string[1][0] == 'g':
+                self._put(self.current_state['state']['h' + move_string[1][1]], 'f', move_string[1][1])
+        # Promotion or en passant
         elif self.current_state['state'][move_string[0]].__class__ == Pawn:
-            pass
-        pass
+            if move_string[1][1] in '18':
+                pass
+
+            if self.en_passant_possible:
+                pass
 
     def _put(self, piece, file, rank):
         """
-        Underlying API for moving pieces on the board. Hides the hardcoded mapping
+        For moving pieces on the board. Hides the hardcoded mapping
         between chess squares and actual grid coordinates.
 
         Parameters
@@ -144,21 +155,21 @@ class Board:
 
         return False
 
-    def is_square_under_attack(self, file, rank):
-        """
-        Checks whether the specified square(<file><rank>) is under attack by any
-        of enemy pieces.
+    # def is_square_under_attack(self, file, rank):
+    #     """
+    #     Checks whether the specified square(<file><rank>) is under attack by any
+    #     of enemy pieces.
 
-        Returns
-        --------
-        bool
-            True if square is under attack, False otherwise
-        """
-        for p in self.current_state['state'].values():
-            if p is not None and p.side != self.current_state['player'] and p.can_mate_king(file + rank, self.current_state['state']):
-                return True
+    #     Returns
+    #     --------
+    #     bool
+    #         True if square is under attack, False otherwise
+    #     """
+    #     for p in self.current_state['state'].values():
+    #         if p is not None and p.side != self.current_state['player'] and file + rank in p.all_legal_moves():
+    #             return True
 
-        return False
+    #     return False
 
     def all_legal_moves(self):
         """

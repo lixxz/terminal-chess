@@ -7,7 +7,7 @@ class Pawn:
         self.side = side
         self.file = file
         self.rank = rank
-        self.num_moves = -1 # -1 -> 0 when pieces are initialized on the board by Board._put()
+        self.num_moves = -1  # -1 -> 0 when pieces are initialized on the board by Board._put()
         self.move_history = []
 
     def __str__(self):
@@ -374,8 +374,42 @@ class Knight:
     def __repr__(self):
         return "{} Knight {}{}".format(self.side, self.file, self.rank)
 
+    def all_legal_moves(self):
+        rank_index = RANKS.index(self.rank)
+        file_index = FILES.index(self.file)
+        moves = []
+
+        directions = [(-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2)]
+
+        for d in directions:
+            if 0 <= file_index + d[0] < len(FILES) and 0 <= rank_index + d[1] < len(RANKS):
+                chess_square = FILES[file_index + d[0]] + RANKS[rank_index + d[1]]
+                if self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side != self.side:
+                    if self.board.leads_to_check(self, chess_square[0], chess_square[1]):
+                        continue
+                    else:
+                        moves.append(chess_square)
+                elif self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side == self.side:
+                    continue
+                else:
+                    if self.board.leads_to_check(self, chess_square[0], chess_square[1]):
+                        continue
+                    else:
+                        moves.append(chess_square)
+
+        return moves
+
     def can_mate_king(self, king_pos, future_board_state):
-        # TODO
+        rank_index = RANKS.index(self.rank)
+        file_index = FILES.index(self.file)
+
+        directions = [(-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2)]
+
+        for d in directions:
+            if 0 <= file_index + d[0] < len(FILES) and 0 <= rank_index + d[1] < len(RANKS):
+                chess_square = FILES[file_index + d[0]] + RANKS[rank_index + d[1]]
+                if future_board_state[chess_square] is not None and future_board_state[chess_square].side != self.side and chess_square == king_pos:
+                    return True
         return False
 
 
@@ -682,15 +716,14 @@ class King:
                 if r == f == 0:
                     continue
                 elif 0 <= rank_index + r < len(RANKS) and 0 <= file_index + f < len(FILES):
-                    chess_square = f + r
+                    chess_square = FILES[file_index + f] + RANKS[rank_index + r]
                     if self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side != self.side:
                         if self.board.leads_to_check(self, chess_square[0], chess_square[1]):
                             continue
                         else:
                             moves.append(chess_square)
-                            break
                     elif self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side == self.side:
-                        break
+                        continue
                     else:
                         if self.board.leads_to_check(self, chess_square[0], chess_square[1]):
                             continue
@@ -699,18 +732,21 @@ class King:
                 else:
                     continue
 
-        if self.num_moves == 0:
+        if self.num_moves == 0 and not self.board.leads_to_check(self, self.file, self.rank):
             # Queenside Castling
             queenside_rook = self.board.current_state['state']['a' + self.rank]
             if queenside_rook is not None and queenside_rook.__class__ == Rook and queenside_rook.num_moves == 0 and not any(self.board.current_state['state'][f + self.rank] for f in 'bcd'):
-                # If king is not currently in check
-                if not self.board.leads_to_check(self, self.file, self.rank):
-                    pass
+                # Square king move through are not under attack
+                if not self.board.leads_to_check(self, 'd', self.rank) and not self.board.leads_to_check(self, 'c', self.rank):
+                    print('queenside', self.side)
+                    moves.append('c' + self.rank)
 
             # Kingside Castling
             kingside_rook = self.board.current_state['state']['h' + self.rank]
             if kingside_rook is not None and kingside_rook.__class__ == Rook and kingside_rook.num_moves == 0 and not any(self.board.current_state['state'][f + self.rank] for f in 'fg'):
-                pass
+                if not self.board.leads_to_check(self, 'f', self.rank) and not self.board.leads_to_check(self, 'g', self.rank):
+                    print('kingside', self.side)
+                    moves.append('g' + self.rank)
 
         return moves
 
@@ -723,7 +759,7 @@ class King:
                 if r == f == 0:
                     continue
                 elif 0 <= rank_index + r < len(RANKS) and 0 <= file_index + f < len(FILES):
-                    chess_square = f + r
+                    chess_square = FILES[file_index + f] + RANKS[rank_index + r]
                     if future_board_state[chess_square] is not None and future_board_state[chess_square].side != self.side and chess_square == king_pos:
                         return True
         return False
