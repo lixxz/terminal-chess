@@ -52,18 +52,22 @@ def main():
             move = input("\nYour Move(? for help): ")
             if move == '?':
                 show_help()
+            elif move == 's':
+                print(b.all_legal_moves())
+            elif move == 'q':
+                break
             else:
                 try:
                     b.input(move)
                 except InvalidMove:
+                    print(move)
                     print("Invalid Move")
                     continue
-            pass
         else:
             # AI's turn
-            b.input(ai.get_random_move())
-            pass
-        break
+            c_move = input("Computer Move(? for help): ")  # ai.get_random_move()
+            b.input(c_move)
+            print("\nComputer played: {}".format(c_move))
 
 
 if __name__ == "__main__":

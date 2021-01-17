@@ -7,6 +7,5 @@ Python program to play chess from your terminal. Requires Python 3. Work In Prog
 ## Todo
 - [x] Basic project structure and event flow.
 - [x] Rook functionality.
-- [ ] Implement logic for Pawn, Knight, Bishop, King and Queen.
-- [ ] Input parser with support for Standard Algebraic Notation.
+- [x] Implement logic for Pawn, Knight, Bishop, King and Queen.
 - [ ] Implement computer AI.

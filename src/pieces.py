@@ -1,4 +1,4 @@
-from consts import WHITE, BLACK, RESET, RANKS, FILES
+from consts import WHITE, BLACK, RESET, RANKS, FILES, SIDES
 
 
 class Pawn:
@@ -7,8 +7,10 @@ class Pawn:
         self.side = side
         self.file = file
         self.rank = rank
-        self.num_moves = -1  # -1 -> 0 when pieces are initialized on the board by Board._put()
+        self.num_moves = -1
         self.move_history = []
+        self.diagonal_moves = {SIDES[0]: [(1, 1), (-1, 1)], SIDES[1]: [(1, -1), (-1, -1)]}
+        self.forward_moves = {SIDES[0]: [(0, 1), (0, 2)], SIDES[1]: [(0, -1), (0, -2)]}
 
     def __str__(self):
         if self.side == 'b':
@@ -20,10 +22,61 @@ class Pawn:
         return "{} Pawn {}{}".format(self.side, self.file, self.rank)
 
     def all_legal_moves(self):
-        pass
+        rank_index = RANKS.index(self.rank)
+        file_index = FILES.index(self.file)
+        moves = []
+
+        for f, r in self.diagonal_moves[self.side]:
+            if 0 <= file_index + f < len(FILES) and 0 <= rank_index + r < len(RANKS):
+                chess_square = FILES[file_index + f] + RANKS[rank_index + r]
+                if self.board.current_state['state'][chess_square] is not None and self.board.current_state['state'][chess_square].side != self.side:
+                    if self.board.leads_to_check(self, chess_square[0], chess_square[1]):
+                        continue
+                    else:
+                        moves.append(chess_square)
+                elif self.board.current_state['state'][chess_square] is None and self.board.current_state['state'][chess_square[0] + self.rank].__class__ == Pawn:
+                    # en passant
+                    if self.side == SIDES[0] and self.rank == '5' and self.board.current_state['state'][chess_square[0] + self.rank].__class__ == Pawn and self.board.current_state['state'][chess_square[0] + self.rank].num_moves == 1 and self.board.current_state['state'][chess_square[0] + self.rank].move_history[-1] == self.board.current_state['move']:
+                        moves.append(chess_square)
+                    elif self.side == SIDES[1] and self.rank == '4' and self.board.current_state['state'][chess_square[0] + self.rank].__class__ == Pawn and self.board.current_state['state'][chess_square[0] + self.rank].num_moves == 1 and self.board.current_state['state'][chess_square[0] + self.rank].move_history[-1] == self.board.current_state['move']:
+                        moves.append(chess_square)
+
+        for f, r in self.forward_moves[self.side]:
+            if 0 <= file_index + f < len(FILES) and 0 <= rank_index + r < len(RANKS):
+                chess_square = FILES[file_index + f] + RANKS[rank_index + r]
+                if abs(r) == 2 and self.num_moves > 0:
+                    break
+                if self.board.current_state['state'][chess_square] is not None:
+                    break
+                else:
+                    if self.board.leads_to_check(self, chess_square[0], chess_square[1]):
+                        continue
+                    else:
+                        moves.append(chess_square)
+
+        return moves
+
+    def is_en_passant(self, chess_square):
+        """
+        Whether the given move in pawn's legal moves is en passant or not
+        """
+        if self.board.current_state['state'][chess_square] is None and self.board.current_state['state'][chess_square[0] + self.rank].__class__ == Pawn:
+            # en passant
+            if self.side == SIDES[0] and self.rank == '5' and self.board.current_state['state'][chess_square[0] + self.rank].__class__ == Pawn and self.board.current_state['state'][chess_square[0] + self.rank].num_moves == 1 and self.board.current_state['state'][chess_square[0] + self.rank].move_history[-1] == self.board.current_state['move']:
+                return True
+            elif self.side == SIDES[1] and self.rank == '4' and self.board.current_state['state'][chess_square[0] + self.rank].__class__ == Pawn and self.board.current_state['state'][chess_square[0] + self.rank].num_moves == 1 and self.board.current_state['state'][chess_square[0] + self.rank].move_history[-1] == self.board.current_state['move']:
+                return True
+        return False
 
     def can_mate_king(self, king_pos, future_board_state):
-        # TODO
+        rank_index = RANKS.index(self.rank)
+        file_index = FILES.index(self.file)
+
+        for f, r in self.diagonal_moves[self.side]:
+            if 0 <= file_index + f < len(FILES) and 0 <= rank_index + r < len(RANKS):
+                chess_square = FILES[file_index + f] + RANKS[rank_index + r]
+                if future_board_state[chess_square] is not None and future_board_state[chess_square].side != self.side and chess_square == king_pos:
+                    return True
         return False
 
 
