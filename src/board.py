@@ -77,7 +77,20 @@ class Board:
         # Promotion
         elif self.current_state['state'][move_string[0]].__class__ == Pawn and move_string[1][1] in '18':
             h['special'] = 'promotion'
-            pass
+            while True:
+                promote_to = input("Promote to (Q/R/B/N): ")
+                if promote_to == 'Q':
+                    self._put(Queen(self, self.current_state['player'], move_string[1][0], move_string[1][1]), move_string[1][0], move_string[1][1])
+                elif promote_to == 'R':
+                    self._put(Rook(self, self.current_state['player'], move_string[1][0], move_string[1][1]), move_string[1][0], move_string[1][1])
+                elif promote_to == 'N':
+                    self._put(Knight(self, self.current_state['player'], move_string[1][0], move_string[1][1]), move_string[1][0], move_string[1][1])
+                elif promote_to == 'B':
+                    self._put(Bishop(self, self.current_state['player'], move_string[1][0], move_string[1][1]), move_string[1][0], move_string[1][1])
+                else:
+                    continue
+                break
+            self._delete(move_string[0][0], move_string[0][1])
         # En passant
         elif self.current_state['state'][move_string[0]].__class__ == Pawn and (move_string[0][1] == '5' or move_string[0][1] == '4') and self.current_state['state'][move_string[0]].is_en_passant(move_string[1]):
             h['special'] = 'passant'

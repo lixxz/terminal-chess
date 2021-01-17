@@ -34,12 +34,8 @@ class Pawn:
                         continue
                     else:
                         moves.append(chess_square)
-                elif self.board.current_state['state'][chess_square] is None and self.board.current_state['state'][chess_square[0] + self.rank].__class__ == Pawn:
-                    # en passant
-                    if self.side == SIDES[0] and self.rank == '5' and self.board.current_state['state'][chess_square[0] + self.rank].__class__ == Pawn and self.board.current_state['state'][chess_square[0] + self.rank].num_moves == 1 and self.board.current_state['state'][chess_square[0] + self.rank].move_history[-1] == self.board.current_state['move']:
-                        moves.append(chess_square)
-                    elif self.side == SIDES[1] and self.rank == '4' and self.board.current_state['state'][chess_square[0] + self.rank].__class__ == Pawn and self.board.current_state['state'][chess_square[0] + self.rank].num_moves == 1 and self.board.current_state['state'][chess_square[0] + self.rank].move_history[-1] == self.board.current_state['move']:
-                        moves.append(chess_square)
+                elif self.is_en_passant(chess_square):
+                    moves.append(chess_square)
 
         for f, r in self.forward_moves[self.side]:
             if 0 <= file_index + f < len(FILES) and 0 <= rank_index + r < len(RANKS):
@@ -61,7 +57,6 @@ class Pawn:
         Whether the given move in pawn's legal moves is en passant or not
         """
         if self.board.current_state['state'][chess_square] is None and self.board.current_state['state'][chess_square[0] + self.rank].__class__ == Pawn:
-            # en passant
             if self.side == SIDES[0] and self.rank == '5' and self.board.current_state['state'][chess_square[0] + self.rank].__class__ == Pawn and self.board.current_state['state'][chess_square[0] + self.rank].num_moves == 1 and self.board.current_state['state'][chess_square[0] + self.rank].move_history[-1] == self.board.current_state['move']:
                 return True
             elif self.side == SIDES[1] and self.rank == '4' and self.board.current_state['state'][chess_square[0] + self.rank].__class__ == Pawn and self.board.current_state['state'][chess_square[0] + self.rank].num_moves == 1 and self.board.current_state['state'][chess_square[0] + self.rank].move_history[-1] == self.board.current_state['move']:
